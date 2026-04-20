@@ -1,0 +1,27 @@
+{
+  "kind": "singleType",
+  "collectionName": "configuraciones",
+  "info": {
+    "singularName": "configuracion",
+    "pluralName": "configuraciones",
+    "displayName": "Configuracion"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre_tienda": {
+      "type": "string"
+    },
+    "telefono_whatsapp": {
+      "type": "string"
+    },
+    "mensaje_base": {
+      "type": "string"
+    },
+    "costo_envio": {
+      "type": "decimal"
+    }
+  }
+}
