@@ -489,9 +489,9 @@ export interface ApiConfiguracionConfiguracion extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     mensaje_base: Schema.Attribute.String;
-    nombre_tienda: Schema.Attribute.String;
+    nombre_tienda: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    telefono_whatsapp: Schema.Attribute.String;
+    telefono_whatsapp: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -512,20 +512,20 @@ export interface ApiPedidoPedido extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    direccion: Schema.Attribute.String;
+    direccion: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::pedido.pedido'
     > &
       Schema.Attribute.Private;
-    nombre_envia: Schema.Attribute.String;
-    nombre_recibe: Schema.Attribute.String;
+    nombre_envia: Schema.Attribute.String & Schema.Attribute.Required;
+    nombre_recibe: Schema.Attribute.String & Schema.Attribute.Required;
     nota: Schema.Attribute.Text;
     productos: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
-    telefono_envia: Schema.Attribute.String;
-    telefono_recibe: Schema.Attribute.String;
+    telefono_envia: Schema.Attribute.String & Schema.Attribute.Required;
+    telefono_recibe: Schema.Attribute.String & Schema.Attribute.Required;
     total: Schema.Attribute.Decimal;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -549,15 +549,16 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     descripcion: Schema.Attribute.Blocks;
     disponible: Schema.Attribute.Boolean;
-    imagen: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    imagen: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'> &
+      Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::product.product'
     > &
       Schema.Attribute.Private;
-    nombre: Schema.Attribute.String;
-    precio: Schema.Attribute.Decimal;
+    nombre: Schema.Attribute.String & Schema.Attribute.Required;
+    precio: Schema.Attribute.Decimal & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

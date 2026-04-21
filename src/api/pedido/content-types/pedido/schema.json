@@ -12,19 +12,24 @@
   "pluginOptions": {},
   "attributes": {
     "nombre_envia": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "telefono_envia": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "nombre_recibe": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "telefono_recibe": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "direccion": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "nota": {
       "type": "text"

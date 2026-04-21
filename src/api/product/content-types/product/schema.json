@@ -12,10 +12,12 @@
   "pluginOptions": {},
   "attributes": {
     "nombre": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "precio": {
-      "type": "decimal"
+      "type": "decimal",
+      "required": true
     },
     "descripcion": {
       "type": "blocks"
@@ -23,6 +25,7 @@
     "imagen": {
       "type": "media",
       "multiple": false,
+      "required": true,
       "allowedTypes": [
         "images",
         "files",

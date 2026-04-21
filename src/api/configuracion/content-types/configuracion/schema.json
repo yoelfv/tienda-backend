@@ -12,10 +12,12 @@
   "pluginOptions": {},
   "attributes": {
     "nombre_tienda": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "telefono_whatsapp": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "mensaje_base": {
       "type": "string"
