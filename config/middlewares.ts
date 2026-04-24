@@ -9,17 +9,17 @@ export default [
         directives: {
           'connect-src': ["'self'", 'https:'],
           'img-src': [
-		    "'self'",
+            "'self'",
             'data:',
             'blob:',
             'https://market-assets.strapi.io',
             'https://res.cloudinary.com',
           ],
-            'media-src': [
+          'media-src': [
             "'self'",
             'data:',
             'blob:',
-            'https://res.cloudinary.com', // <-- Y TAMBIÉN ESTA
+            'https://res.cloudinary.com',
           ],
           upgradeInsecureRequests: null,
         },
@@ -31,8 +31,14 @@ export default [
     config: {
       enabled: true,
       headers: '*',
-      origin: ['http://localhost:4321', 'http://localhost:3000', 'https://*.pages.dev'],
+      origin: [
+        'http://localhost:4321',
+        'http://localhost:3000',
+        'https://tienda-frontend-1yj.pages.dev',
+        /^https:\/\/.*\.pages\.dev$/,
+      ],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+      keepHeaderOnError: true,
     },
   },
   'strapi::poweredBy',
