@@ -2,7 +2,8 @@ import path from 'path';
 import type { Core } from '@strapi/strapi';
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database => {
-  const client = env('DATABASE_CLIENT', 'sqlite');
+  // Cambiamos el valor por defecto de 'sqlite' a 'postgres'
+  const client = env('DATABASE_CLIENT', 'postgres');
 
   const connections = {
     mysql: {
