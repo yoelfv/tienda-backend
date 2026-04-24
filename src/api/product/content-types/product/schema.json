@@ -35,6 +35,11 @@
     },
     "disponible": {
       "type": "boolean"
+    },
+    "categoria": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::categoria.categoria"
     }
   }
 }
