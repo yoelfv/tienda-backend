@@ -24,6 +24,28 @@
     },
     "costo_envio": {
       "type": "decimal"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "descripcion_tienda": {
+      "type": "blocks",
+      "required": false
+    },
+    "direccion": {
+      "type": "string",
+      "required": false
+    },
+    "telefono": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
     }
   }
 }
