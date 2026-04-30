@@ -533,41 +533,6 @@ export interface ApiConfiguracionConfiguracion extends Struct.SingleTypeSchema {
   };
 }
 
-export interface ApiPedidoPedido extends Struct.CollectionTypeSchema {
-  collectionName: 'pedidos';
-  info: {
-    displayName: 'Pedido';
-    pluralName: 'pedidos';
-    singularName: 'pedido';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    direccion: Schema.Attribute.String & Schema.Attribute.Required;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::pedido.pedido'
-    > &
-      Schema.Attribute.Private;
-    nombre_envia: Schema.Attribute.String & Schema.Attribute.Required;
-    nombre_recibe: Schema.Attribute.String & Schema.Attribute.Required;
-    nota: Schema.Attribute.Text;
-    productos: Schema.Attribute.JSON;
-    publishedAt: Schema.Attribute.DateTime;
-    telefono_envia: Schema.Attribute.String & Schema.Attribute.Required;
-    telefono_recibe: Schema.Attribute.String & Schema.Attribute.Required;
-    total: Schema.Attribute.Decimal;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiProductProduct extends Struct.CollectionTypeSchema {
   collectionName: 'products';
   info: {
@@ -1119,7 +1084,6 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::categoria.categoria': ApiCategoriaCategoria;
       'api::configuracion.configuracion': ApiConfiguracionConfiguracion;
-      'api::pedido.pedido': ApiPedidoPedido;
       'api::product.product': ApiProductProduct;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
