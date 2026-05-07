@@ -36,6 +36,8 @@ export default [
         'http://localhost:3000',
         'http://localhost:1337',
         'https://tienda-frontend-1yj.pages.dev',
+		'https://tienda-cubaclick.com',
+		'https://www.tienda-cubaclick.com',
         /^https:\/\/.*\.pages\.dev$/,
         /^http:\/\/localhost:\d+$/,
       ],
