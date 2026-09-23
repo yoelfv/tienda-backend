@@ -110,6 +110,8 @@ node_modules
 !.yarn/versions
 .pnp.*
 yarn-error.log
+pnpm-lock.yaml
+pnpm-workspace.yaml
 
 ############################
 # Tests
