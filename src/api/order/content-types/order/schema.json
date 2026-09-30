@@ -7,7 +7,7 @@
     "displayName": "Order"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -24,9 +24,37 @@
       "type": "date",
       "required": true
     },
-    "recipient": {
+    "customer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::customer.customer",
+      "inversedBy": "orders",
+      "required": true
+    },
+    "salesRep": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::sales-rep.sales-rep",
+      "inversedBy": "orders",
+      "required": true
+    },
+    "recipientName": {
       "type": "string",
       "required": true
+    },
+    "recipientPhone": {
+      "type": "string",
+      "required": true
+    },
+    "remittance": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "total": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
     },
     "paymentStatus": {
       "type": "enumeration",
@@ -37,32 +65,12 @@
         "pending"
       ]
     },
-    "remittance": {
-      "type": "decimal",
-      "default": 0
-    },
-    "total": {
-      "type": "decimal",
-      "required": true,
-      "default": 0
-    },
     "cancelled": {
       "type": "boolean",
+      "required": true,
       "default": false
     },
-    "customer": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::customer.customer",
-      "inversedBy": "orders"
-    },
-    "sales_rep": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::sales-rep.sales-rep",
-      "inversedBy": "orders"
-    },
-    "order_items": {
+    "orderItems": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::order-item.order-item",

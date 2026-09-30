@@ -7,7 +7,7 @@
     "displayName": "SalesRep"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -15,15 +15,24 @@
       "type": "string",
       "required": true
     },
+    "initials": {
+      "type": "string",
+      "required": true,
+	  "unique": true,
+      "minLength": 3,
+      "maxLength": 3,
+	  "regex": "^[A-Z]{3}$"
+    },
     "active": {
       "type": "boolean",
-      "default": true
+      "default": true,
+      "required": true
     },
     "orders": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::order.order",
-      "mappedBy": "sales_rep"
+      "mappedBy": "salesRep"
     }
   }
 }

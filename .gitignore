@@ -68,6 +68,7 @@ $RECYCLE.BIN/
 .tmp
 *.log
 *.sql
+*.db
 *.sqlite
 *.sqlite3
 
@@ -79,6 +80,7 @@ $RECYCLE.BIN/
 *#
 ssl
 .idea
+.vscode/
 nbproject
 public/uploads/*
 !public/uploads/.gitkeep
@@ -118,6 +120,7 @@ pnpm-workspace.yaml
 ############################
 
 coverage
+test-order.json
 
 ############################
 # Strapi

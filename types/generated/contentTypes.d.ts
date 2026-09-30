@@ -541,7 +541,7 @@ export interface ApiCustomerCustomer extends Struct.CollectionTypeSchema {
     singularName: 'customer';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -572,7 +572,7 @@ export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
     singularName: 'order-item';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -584,8 +584,10 @@ export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
       'api::order-item.order-item'
     > &
       Schema.Attribute.Private;
-    order: Schema.Attribute.Relation<'manyToOne', 'api::order.order'>;
-    producto: Schema.Attribute.Relation<'oneToOne', 'api::product.product'>;
+    order: Schema.Attribute.Relation<'manyToOne', 'api::order.order'> &
+      Schema.Attribute.Required;
+    product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'> &
+      Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     quantity: Schema.Attribute.Integer & Schema.Attribute.Required;
     unitPrice: Schema.Attribute.Decimal & Schema.Attribute.Required;
@@ -603,22 +605,25 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     singularName: 'order';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
-    cancelled: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    cancelled: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
     code: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    customer: Schema.Attribute.Relation<'manyToOne', 'api::customer.customer'>;
+    customer: Schema.Attribute.Relation<'manyToOne', 'api::customer.customer'> &
+      Schema.Attribute.Required;
     date: Schema.Attribute.Date & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::order.order'> &
       Schema.Attribute.Private;
-    order_items: Schema.Attribute.Relation<
+    orderItems: Schema.Attribute.Relation<
       'oneToMany',
       'api::order-item.order-item'
     >;
@@ -626,12 +631,16 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'pending'>;
     publishedAt: Schema.Attribute.DateTime;
-    recipient: Schema.Attribute.String & Schema.Attribute.Required;
-    remittance: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>;
-    sales_rep: Schema.Attribute.Relation<
+    recipientName: Schema.Attribute.String & Schema.Attribute.Required;
+    recipientPhone: Schema.Attribute.String & Schema.Attribute.Required;
+    remittance: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    salesRep: Schema.Attribute.Relation<
       'manyToOne',
       'api::sales-rep.sales-rep'
-    >;
+    > &
+      Schema.Attribute.Required;
     sequenceNumber: Schema.Attribute.Integer & Schema.Attribute.Required;
     total: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
@@ -687,13 +696,22 @@ export interface ApiSalesRepSalesRep extends Struct.CollectionTypeSchema {
     singularName: 'sales-rep';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
-    active: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    active: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    initials: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 3;
+        minLength: 3;
+      }>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

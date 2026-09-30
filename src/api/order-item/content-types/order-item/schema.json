@@ -7,7 +7,7 @@
     "displayName": "Order-item"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -23,12 +23,14 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::order.order",
-      "inversedBy": "order_items"
+      "inversedBy": "orderItems",
+      "required": true
     },
-    "producto": {
+    "product": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::product.product"
+      "relation": "manyToOne",
+      "target": "api::product.product",
+      "required": true
     }
   }
 }
