@@ -12,5 +12,13 @@ export default {
         auth: false,
       },
     },
+    {
+      method: 'PUT',
+      path: '/orders/:documentId',
+      handler: 'api::order.order.updateOrder',
+      config: {
+        auth: false,
+      },
+    },
   ],
 };
