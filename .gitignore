@@ -86,6 +86,9 @@ public/uploads/*
 !public/uploads/.gitkeep
 .tsbuildinfo
 .eslintcache
+.prettierignore
+.prettierrc
+eslint.config.mjs
 
 ############################
 # Node.js
@@ -112,8 +115,6 @@ node_modules
 !.yarn/versions
 .pnp.*
 yarn-error.log
-pnpm-lock.yaml
-pnpm-workspace.yaml
 
 ############################
 # Tests
