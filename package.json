@@ -18,7 +18,7 @@
   "dependencies": {
     "@strapi/plugin-cloud": "5.42.1",
     "@strapi/plugin-users-permissions": "5.42.1",
-    "@strapi/provider-upload-cloudinary": "^5.42.1",
+    "@strapi/provider-upload-cloudinary": "5.42.1",
     "@strapi/strapi": "5.42.1",
     "better-sqlite3": "12.8.0",
     "pg": "^8.20.0",
@@ -26,6 +26,9 @@
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
     "styled-components": "^6.0.0"
+  },
+  "overrides": {
+    "@strapi/admin": "5.42.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
