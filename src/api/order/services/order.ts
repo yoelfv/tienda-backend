@@ -60,6 +60,17 @@ export default factories.createCoreService(
           throw new Error("La fecha es obligatoria");
         }
 
+        const today = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "America/Havana",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date());
+
+        if (data.date > today) {
+          throw new Error("La fecha del pedido no puede ser posterior a hoy");
+        }
+
         if (!data.salesRep) {
           throw new Error("La vendedora es obligatoria");
         }
@@ -529,6 +540,273 @@ export default factories.createCoreService(
           productsTotal,
           remittance,
           paymentStatus: data.paymentStatus,
+        };
+      });
+    },
+
+    async getCustomerOrders(
+      customerDocumentId: string,
+      options: {
+        dateFrom?: string;
+        dateTo?: string;
+        page?: number;
+        pageSize?: number;
+      } = {},
+    ) {
+      const page = Math.max(1, options.page ?? 1);
+      const pageSize = Math.min(100, Math.max(1, options.pageSize ?? 10));
+
+      const filters: Record<string, unknown> = {
+        customer: {
+          documentId: customerDocumentId,
+        },
+      };
+
+      if (options.dateFrom || options.dateTo) {
+        const dateFilter: Record<string, string> = {};
+
+        if (options.dateFrom) {
+          dateFilter.$gte = options.dateFrom;
+        }
+
+        if (options.dateTo) {
+          dateFilter.$lte = options.dateTo;
+        }
+
+        filters.date = dateFilter;
+      }
+
+      const summaryFilters = {
+        ...filters,
+        cancelled: false,
+      };
+
+      const [orders, total, summaryOrders] = await Promise.all([
+        strapi.documents("api::order.order").findMany({
+          filters,
+          sort: {
+            date: "desc",
+            sequenceNumber: "desc",
+          },
+          populate: {
+            customer: true,
+            salesRep: true,
+            orderItems: {
+              populate: {
+                product: true,
+              },
+            },
+          },
+          start: (page - 1) * pageSize,
+          limit: pageSize,
+        }),
+
+        strapi.documents("api::order.order").count({
+          filters,
+        }),
+
+        strapi.documents("api::order.order").findMany({
+          filters: summaryFilters,
+          fields: ["total", "paymentStatus"],
+          page: 1,
+          pageSize: 10000,
+        }),
+      ]);
+
+      const totalOrders = summaryOrders.length;
+
+      const totalAmount = summaryOrders.reduce(
+        (sum, order) => sum + Number(order.total),
+        0,
+      );
+
+      const paidOrders = summaryOrders.filter(
+        (order) => order.paymentStatus === "paid",
+      );
+
+      const pendingOrders = summaryOrders.filter(
+        (order) => order.paymentStatus === "pending",
+      );
+
+      const paidAmount = paidOrders.reduce(
+        (sum, order) => sum + Number(order.total),
+        0,
+      );
+
+      const pendingAmount = pendingOrders.reduce(
+        (sum, order) => sum + Number(order.total),
+        0,
+      );
+
+      return {
+        data: orders,
+        meta: {
+          pagination: {
+            page,
+            pageSize,
+            pageCount: Math.ceil(total / pageSize),
+            total,
+          },
+          summary: {
+            totalOrders,
+            totalAmount,
+            paidOrders: paidOrders.length,
+            paidAmount,
+            pendingOrders: pendingOrders.length,
+            pendingAmount,
+          },
+        },
+      };
+    },
+
+    async getSalesRepOrders(
+      salesRepDocumentId: string,
+      options: {
+        dateFrom?: string;
+        dateTo?: string;
+        page?: number;
+        pageSize?: number;
+      } = {},
+    ) {
+      const page = Math.max(1, options.page ?? 1);
+      const pageSize = Math.min(100, Math.max(1, options.pageSize ?? 10));
+
+      const filters: Record<string, unknown> = {
+        salesRep: {
+          documentId: salesRepDocumentId,
+        },
+      };
+
+      if (options.dateFrom || options.dateTo) {
+        const dateFilter: Record<string, string> = {};
+
+        if (options.dateFrom) {
+          dateFilter.$gte = options.dateFrom;
+        }
+
+        if (options.dateTo) {
+          dateFilter.$lte = options.dateTo;
+        }
+
+        filters.date = dateFilter;
+      }
+
+      // Los pedidos cancelados aparecen en el historial,
+      // pero no participan en las estadísticas.
+      const summaryFilters = {
+        ...filters,
+        cancelled: false,
+      };
+
+      const [orders, total, summaryOrders] = await Promise.all([
+        strapi.documents("api::order.order").findMany({
+          filters,
+          sort: {
+            date: "desc",
+            sequenceNumber: "desc",
+          },
+          populate: {
+            customer: true,
+            salesRep: true,
+            orderItems: {
+              populate: {
+                product: true,
+              },
+            },
+          },
+          start: (page - 1) * pageSize,
+          limit: pageSize,
+        }),
+
+        strapi.documents("api::order.order").count({
+          filters,
+        }),
+
+        strapi.documents("api::order.order").findMany({
+          filters: summaryFilters,
+          fields: ["total", "paymentStatus"],
+          page: 1,
+          pageSize: 10000,
+        }),
+      ]);
+
+      const totalAmount = summaryOrders.reduce(
+        (sum, order) => sum + Number(order.total),
+        0,
+      );
+
+      const paidOrders = summaryOrders.filter(
+        (order) => order.paymentStatus === "paid",
+      );
+
+      const pendingOrders = summaryOrders.filter(
+        (order) => order.paymentStatus === "pending",
+      );
+
+      const paidAmount = paidOrders.reduce(
+        (sum, order) => sum + Number(order.total),
+        0,
+      );
+
+      const pendingAmount = pendingOrders.reduce(
+        (sum, order) => sum + Number(order.total),
+        0,
+      );
+
+      return {
+        data: orders,
+        meta: {
+          pagination: {
+            page,
+            pageSize,
+            pageCount: Math.ceil(total / pageSize),
+            total,
+          },
+          summary: {
+            totalOrders: summaryOrders.length,
+            totalAmount,
+            paidOrders: paidOrders.length,
+            paidAmount,
+            pendingOrders: pendingOrders.length,
+            pendingAmount,
+          },
+        },
+      };
+    },
+
+    async cancelOrder(orderDocumentId: string) {
+      return await strapi.db.transaction(async () => {
+        if (!orderDocumentId) {
+          throw new Error("El pedido es obligatorio");
+        }
+
+        const existingOrder = await strapi
+          .documents("api::order.order")
+          .findOne({
+            documentId: orderDocumentId,
+          });
+
+        if (!existingOrder) {
+          throw new Error("El pedido indicado no existe");
+        }
+
+        if (existingOrder.cancelled) {
+          throw new Error("El pedido ya está cancelado");
+        }
+
+        const cancelledOrder = await strapi
+          .documents("api::order.order")
+          .update({
+            documentId: orderDocumentId,
+            data: {
+              cancelled: true,
+            },
+          });
+
+        return {
+          documentId: cancelledOrder.documentId,
+          code: cancelledOrder.code,
+          cancelled: true,
         };
       });
     },
