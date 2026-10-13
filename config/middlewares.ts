@@ -38,6 +38,7 @@ export default [
         'http://localhost:5173',
 		'http://192.168.101.183:5173',
         'https://tienda-frontend-1yj.pages.dev',
+		'https://cubaclick-control.pages.dev/',
 		    'https://tienda-cubaclick.com',
 		    'https://www.tienda-cubaclick.com',
         /^https:\/\/.*\.pages\.dev$/,
