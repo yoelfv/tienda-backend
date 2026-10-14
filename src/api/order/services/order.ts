@@ -774,6 +774,136 @@ export default factories.createCoreService(
       };
     },
 
+    async getStatistics(options: {
+      dateFrom?: string;
+      dateTo?: string;
+      page?: number;
+      pageSize?: number;
+    }) {
+      const { dateFrom, dateTo, page = 1, pageSize = 10 } = options;
+
+      // 1. Construir el filtro base (siempre excluye cancelados)
+      const filters: Record<string, unknown> = {
+        cancelled: { $eq: false },
+      };
+
+      if (dateFrom || dateTo) {
+        const dateFilter: Record<string, string> = {};
+        if (dateFrom) dateFilter.$gte = dateFrom;
+        if (dateTo) dateFilter.$lte = dateTo;
+        filters.date = dateFilter;
+      }
+
+      // 2. Traer TODOS los pedidos que cumplen el filtro.
+      //    Nota: uso un pageSize alto para traerlos de una sola vez.
+      //    Si algún día hay más de 5000 pedidos en un período, habría que paginar internamente.
+      const orders = await strapi.documents("api::order.order").findMany({
+        filters,
+        fields: ["date", "total", "paymentStatus", "cancelled"],
+        limit: 5000,
+      });
+
+      // 3. Calcular el resumen global
+      const summary = {
+        totalOrders: orders.length,
+        totalAmount: 0,
+        paidOrders: 0,
+        paidAmount: 0,
+        pendingOrders: 0,
+        pendingAmount: 0,
+      };
+
+      // 4. Agrupar por día
+      const dailyMap = new Map<
+        string,
+        {
+          date: string;
+          orders: number;
+          total: number;
+          paid: number;
+          pending: number;
+        }
+      >();
+
+      for (const order of orders) {
+        const amount = Number(order.total) || 0;
+        const isPaid = order.paymentStatus === "paid";
+
+        // Resumen global
+        summary.totalAmount += amount;
+        if (isPaid) {
+          summary.paidOrders += 1;
+          summary.paidAmount += amount;
+        } else {
+          summary.pendingOrders += 1;
+          summary.pendingAmount += amount;
+        }
+
+        // Agrupación por día
+        // El campo `date` puede venir como "2026-10-14" o "2026-10-14T00:00:00.000Z"
+        // Normalizamos a YYYY-MM-DD
+        const dayKey = String(order.date).slice(0, 10);
+
+        if (!dailyMap.has(dayKey)) {
+          dailyMap.set(dayKey, {
+            date: dayKey,
+            orders: 0,
+            total: 0,
+            paid: 0,
+            pending: 0,
+          });
+        }
+
+        const day = dailyMap.get(dayKey)!;
+        day.orders += 1;
+        day.total += amount;
+        if (isPaid) {
+          day.paid += amount;
+        } else {
+          day.pending += amount;
+        }
+      }
+
+      // 5. Convertir a array y ordenar por fecha DESC
+      const allDays = Array.from(dailyMap.values()).sort((a, b) =>
+        a.date < b.date ? 1 : -1,
+      );
+
+      // 6. Paginar
+      const total = allDays.length;
+      const pageCount = Math.max(1, Math.ceil(total / pageSize));
+      const safePage = Math.min(Math.max(1, page), pageCount);
+      const start = (safePage - 1) * pageSize;
+      const daily = allDays.slice(start, start + pageSize);
+
+      // 7. Redondear importes a 2 decimales
+      const round = (n: number) => Math.round(n * 100) / 100;
+
+      return {
+        summary: {
+          totalOrders: summary.totalOrders,
+          totalAmount: round(summary.totalAmount),
+          paidOrders: summary.paidOrders,
+          paidAmount: round(summary.paidAmount),
+          pendingOrders: summary.pendingOrders,
+          pendingAmount: round(summary.pendingAmount),
+        },
+        daily: daily.map((d) => ({
+          date: d.date,
+          orders: d.orders,
+          total: round(d.total),
+          paid: round(d.paid),
+          pending: round(d.pending),
+        })),
+        pagination: {
+          page: safePage,
+          pageSize,
+          pageCount,
+          total,
+        },
+      };
+    },
+
     async cancelOrder(orderDocumentId: string) {
       return await strapi.db.transaction(async () => {
         if (!orderDocumentId) {

@@ -30,6 +30,14 @@ export default {
     },
     {
       method: "GET",
+      path: "/orders/statistics",
+      handler: "api::order.order.getStatistics",
+      config: {
+        auth: false,
+      },
+    },
+    {
+      method: "GET",
       path: "/orders/by-customer/:customerDocumentId",
       handler: "api::order.order.getCustomerOrders",
       config: {

@@ -97,6 +97,35 @@ export default factories.createCoreController(
       }
     },
 
+    async getStatistics(ctx) {
+      try {
+        const { dateFrom, dateTo, page, pageSize } = ctx.query;
+
+        const result = await strapi.service("api::order.order").getStatistics({
+          dateFrom: dateFrom as string | undefined,
+          dateTo: dateTo as string | undefined,
+          page: page ? Number(page) : undefined,
+          pageSize: pageSize ? Number(pageSize) : undefined,
+        });
+
+        return ctx.send({
+          data: {
+            summary: result.summary,
+            daily: result.daily,
+          },
+          meta: {
+            pagination: result.pagination,
+          },
+        });
+      } catch (error) {
+        return ctx.badRequest(
+          error instanceof Error
+            ? error.message
+            : "No fue posible obtener las estadísticas.",
+        );
+      }
+    },
+
     async cancelOrder(ctx) {
       try {
         const { documentId } = ctx.params;
