@@ -8,49 +8,43 @@ export default {
       method: "POST",
       path: "/orders/create",
       handler: "api::order.order.createOrder",
-      config: {
-        auth: false,
-      },
+      config: { auth: {} },
     },
     {
       method: "PUT",
       path: "/orders/:documentId",
       handler: "api::order.order.updateOrder",
-      config: {
-        auth: false,
-      },
+      config: { auth: {} },
     },
     {
       method: "PUT",
       path: "/orders/:documentId/cancel",
       handler: "api::order.order.cancelOrder",
-      config: {
-        auth: false,
-      },
+      config: { auth: {} },
+    },
+    {
+      method: "GET",
+      path: "/auth/me-with-role",
+      handler: "api::order.user.meWithRole",
+      config: { auth: {} },
     },
     {
       method: "GET",
       path: "/orders/statistics",
       handler: "api::order.order.getStatistics",
-      config: {
-        auth: false,
-      },
+      config: { auth: {} },
     },
     {
       method: "GET",
       path: "/orders/by-customer/:customerDocumentId",
       handler: "api::order.order.getCustomerOrders",
-      config: {
-        auth: false,
-      },
+      config: { auth: {} },
     },
     {
       method: "GET",
       path: "/orders/by-sales-rep/:salesRepDocumentId",
       handler: "api::order.order.getSalesRepOrders",
-      config: {
-        auth: false,
-      },
+      config: { auth: {} },
     },
   ],
 };
