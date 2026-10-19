@@ -23,8 +23,7 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::order.order",
-      "inversedBy": "orderItems",
-      "required": true
+      "inversedBy": "orderItems"
     },
     "product": {
       "type": "relation",

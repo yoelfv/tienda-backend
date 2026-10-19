@@ -18,10 +18,10 @@
     "initials": {
       "type": "string",
       "required": true,
-	  "unique": true,
+      "unique": true,
       "minLength": 3,
       "maxLength": 3,
-	  "regex": "^[A-Z]{3}$"
+      "regex": "^[A-Z]{3}$"
     },
     "active": {
       "type": "boolean",

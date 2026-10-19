@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bank_accounts",
+  "info": {
+    "singularName": "bank-account",
+    "pluralName": "bank-accounts",
+    "displayName": "Cuenta Bancaria"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "active": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::order.order",
+      "mappedBy": "bankAccount"
+    }
+  }
+}

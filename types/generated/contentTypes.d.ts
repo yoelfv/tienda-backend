@@ -467,6 +467,40 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiBankAccountBankAccount extends Struct.CollectionTypeSchema {
+  collectionName: "bank_accounts";
+  info: {
+    displayName: "Cuenta Bancaria";
+    pluralName: "bank-accounts";
+    singularName: "bank-account";
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    active: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      "oneToMany",
+      "api::bank-account.bank-account"
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    orders: Schema.Attribute.Relation<"oneToMany", "api::order.order">;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCategoriaCategoria extends Struct.CollectionTypeSchema {
   collectionName: "categorias";
   info: {
@@ -584,8 +618,7 @@ export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
       "api::order-item.order-item"
     > &
       Schema.Attribute.Private;
-    order: Schema.Attribute.Relation<"manyToOne", "api::order.order"> &
-      Schema.Attribute.Required;
+    order: Schema.Attribute.Relation<"manyToOne", "api::order.order">;
     product: Schema.Attribute.Relation<"manyToOne", "api::product.product"> &
       Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
@@ -608,6 +641,10 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    bankAccount: Schema.Attribute.Relation<
+      "manyToOne",
+      "api::bank-account.bank-account"
+    >;
     cancelled: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<false>;
@@ -617,8 +654,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
       Schema.Attribute.Private;
-    customer: Schema.Attribute.Relation<"manyToOne", "api::customer.customer"> &
-      Schema.Attribute.Required;
+    customer: Schema.Attribute.Relation<"manyToOne", "api::customer.customer">;
     date: Schema.Attribute.Date & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<"oneToMany", "api::order.order"> &
@@ -639,8 +675,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     salesRep: Schema.Attribute.Relation<
       "manyToOne",
       "api::sales-rep.sales-rep"
-    > &
-      Schema.Attribute.Required;
+    >;
     sequenceNumber: Schema.Attribute.Integer & Schema.Attribute.Required;
     total: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
@@ -1239,6 +1274,7 @@ declare module "@strapi/strapi" {
       "admin::transfer-token": AdminTransferToken;
       "admin::transfer-token-permission": AdminTransferTokenPermission;
       "admin::user": AdminUser;
+      "api::bank-account.bank-account": ApiBankAccountBankAccount;
       "api::categoria.categoria": ApiCategoriaCategoria;
       "api::configuracion.configuracion": ApiConfiguracionConfiguracion;
       "api::customer.customer": ApiCustomerCustomer;

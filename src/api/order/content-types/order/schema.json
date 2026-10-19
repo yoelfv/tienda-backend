@@ -28,15 +28,13 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::customer.customer",
-      "inversedBy": "orders",
-      "required": true
+      "inversedBy": "orders"
     },
     "salesRep": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::sales-rep.sales-rep",
-      "inversedBy": "orders",
-      "required": true
+      "inversedBy": "orders"
     },
     "recipientName": {
       "type": "string",
@@ -75,6 +73,12 @@
       "relation": "oneToMany",
       "target": "api::order-item.order-item",
       "mappedBy": "order"
+    },
+    "bankAccount": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::bank-account.bank-account",
+      "inversedBy": "orders"
     }
   }
 }
