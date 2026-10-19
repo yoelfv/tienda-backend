@@ -46,5 +46,13 @@ export default {
       handler: "api::order.order.getSalesRepOrders",
       config: { auth: {} },
     },
+    {
+      method: "GET",
+      path: "/orders/by-bank-account/:bankAccountDocumentId",
+      handler: "api::order.order.getBankAccountOrders",
+      config: {
+        auth: {},
+      },
+    },
   ],
 };

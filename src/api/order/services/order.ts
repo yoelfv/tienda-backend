@@ -904,6 +904,91 @@ export default factories.createCoreService(
       };
     },
 
+    async getBankAccountOrders(
+      bankAccountDocumentId: string,
+      options: {
+        dateFrom?: string;
+        dateTo?: string;
+        page?: number;
+        pageSize?: number;
+      },
+    ) {
+      const { dateFrom, dateTo, page = 1, pageSize = 10 } = options;
+
+      // 1. Verificar que la cuenta existe
+      const bankAccount = await strapi
+        .documents("api::bank-account.bank-account")
+        .findOne({
+          documentId: bankAccountDocumentId,
+        });
+
+      if (!bankAccount) {
+        throw new Error("No se encontró la cuenta bancaria.");
+      }
+
+      // 2. Construir el filtro de pedidos
+      const filters: Record<string, unknown> = {
+        bankAccount: {
+          documentId: bankAccountDocumentId,
+        },
+        cancelled: { $eq: false },
+      };
+
+      if (dateFrom || dateTo) {
+        const dateFilter: Record<string, string> = {};
+        if (dateFrom) dateFilter.$gte = dateFrom;
+        if (dateTo) dateFilter.$lte = dateTo;
+        filters.date = dateFilter;
+      }
+
+      // 3. Traer todos los pedidos para calcular el resumen
+      const allOrders = await strapi.documents("api::order.order").findMany({
+        filters,
+        fields: ["date", "total", "paymentStatus", "cancelled"],
+        limit: 5000,
+      });
+
+      // 4. Calcular el resumen: solo cantidad de pedidos + importe total
+      let totalOrders = 0;
+      let totalAmount = 0;
+
+      for (const order of allOrders) {
+        const amount = Number(order.total) || 0;
+        totalOrders += 1;
+        totalAmount += amount;
+      }
+
+      // 5. Traer los pedidos paginados con todos los datos necesarios
+      const pageCount = Math.max(1, Math.ceil(totalOrders / pageSize));
+      const safePage = Math.min(Math.max(1, page), pageCount);
+      const start = (safePage - 1) * pageSize;
+
+      const orders = await strapi.documents("api::order.order").findMany({
+        filters,
+        populate: ["customer", "salesRep", "orderItems", "bankAccount"],
+        start,
+        limit: pageSize,
+        sort: ["date:desc", "sequenceNumber:desc"],
+      });
+
+      const round = (n: number) => Math.round(n * 100) / 100;
+
+      return {
+        bankAccount,
+        summary: {
+          totalOrders,
+          totalAmount: round(totalAmount),
+        },
+        data: orders,
+        pagination: {
+          page: safePage,
+          pageSize,
+          pageCount,
+          total: totalOrders,
+        },
+      };
+    },
+
     async cancelOrder(orderDocumentId: string) {
       return await strapi.db.transaction(async () => {
         if (!orderDocumentId) {

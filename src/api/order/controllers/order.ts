@@ -126,6 +126,35 @@ export default factories.createCoreController(
       }
     },
 
+    async getBankAccountOrders(ctx) {
+      try {
+        const { bankAccountDocumentId } = ctx.params;
+
+        if (!bankAccountDocumentId) {
+          return ctx.badRequest("El identificador de la cuenta es obligatorio");
+        }
+
+        const { dateFrom, dateTo, page, pageSize } = ctx.query;
+
+        const result = await strapi
+          .service("api::order.order")
+          .getBankAccountOrders(bankAccountDocumentId, {
+            dateFrom: dateFrom as string | undefined,
+            dateTo: dateTo as string | undefined,
+            page: page ? Number(page) : undefined,
+            pageSize: pageSize ? Number(pageSize) : undefined,
+          });
+
+        return result;
+      } catch (error) {
+        return ctx.badRequest(
+          error instanceof Error
+            ? error.message
+            : "No fue posible obtener los pedidos de la cuenta.",
+        );
+      }
+    },
+
     async cancelOrder(ctx) {
       try {
         const { documentId } = ctx.params;
