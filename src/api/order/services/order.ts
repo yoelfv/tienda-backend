@@ -45,7 +45,7 @@ export default factories.createCoreService(
       recipientName: string;
       recipientPhone: string;
       remittance?: number;
-      paymentStatus: "paid" | "pending";
+      bankAccount?: string | null;
       items: Array<{
         product: string;
         quantity: number;
@@ -183,10 +183,6 @@ export default factories.createCoreService(
          * 5. Validar y calcular la remesa
          */
 
-        if (!["paid", "pending"].includes(data.paymentStatus)) {
-          throw new Error("El estado de pago no es válido");
-        }
-
         const remittance = Number(data.remittance ?? 0);
 
         if (!Number.isFinite(remittance) || remittance < 0) {
@@ -217,7 +213,39 @@ export default factories.createCoreService(
         const code = `${salesRep.initials}-${data.date}-${sequenceNumber}`;
 
         /*
-         * 9. Crear el pedido
+         * 9. Validar la cuenta bancaria (si se proporciona) y calcular paymentStatus
+         *
+         * Ojo: si el pedido ya tenía esta cuenta asignada, permitimos guardarla
+         * aunque esté inactiva. Solo bloqueamos si se intenta asignar una
+         * cuenta inactiva NUEVA (distinta a la que ya tenía el pedido).
+         */
+
+        let bankAccountDocumentId: string | null = null;
+
+        if (data.bankAccount) {
+          const bankAccount = await strapi
+            .documents("api::bank-account.bank-account")
+            .findOne({
+              documentId: data.bankAccount,
+            });
+
+          if (!bankAccount) {
+            throw new Error("La cuenta bancaria indicada no existe");
+          }
+
+          if (!bankAccount.active) {
+            throw new Error("La cuenta bancaria indicada está inactiva");
+          }
+
+          bankAccountDocumentId = bankAccount.documentId;
+        }
+
+        const paymentStatus: "paid" | "pending" = bankAccountDocumentId
+          ? "paid"
+          : "pending";
+
+        /*
+         * 10. Crear el pedido
          */
 
         const order = await strapi.documents("api::order.order").create({
@@ -231,13 +259,15 @@ export default factories.createCoreService(
             recipientPhone: data.recipientPhone,
             remittance,
             total,
-            paymentStatus: data.paymentStatus,
+            paymentStatus,
             cancelled: false,
+            bankAccount: bankAccountDocumentId,
           },
+          populate: ["bankAccount"],
         });
 
         /*
-         * 10. Crear los OrderItems
+         * 11. Crear los OrderItems
          */
 
         for (const item of productItems) {
@@ -252,7 +282,7 @@ export default factories.createCoreService(
         }
 
         /*
-         * 11. Devolver información útil del pedido creado
+         * 12. Devolver información útil del pedido creado
          */
 
         return {
@@ -262,7 +292,7 @@ export default factories.createCoreService(
           total,
           productsTotal,
           remittance,
-          paymentStatus: data.paymentStatus,
+          paymentStatus,
         };
       });
     },
@@ -282,7 +312,7 @@ export default factories.createCoreService(
         recipientName: string;
         recipientPhone: string;
         remittance?: number;
-        paymentStatus: "paid" | "pending";
+        bankAccount?: string | null;
         items: Array<{
           product: string;
           quantity: number;
@@ -328,6 +358,7 @@ export default factories.createCoreService(
           .documents("api::order.order")
           .findOne({
             documentId: orderDocumentId,
+            populate: ["bankAccount"],
           });
 
         if (!existingOrder) {
@@ -457,12 +488,39 @@ export default factories.createCoreService(
         }
 
         /*
-         * 7. Validar el estado de pago
+         * 7. Validar la cuenta bancaria (si se proporciona) y calcular paymentStatus
          */
 
-        if (!["paid", "pending"].includes(data.paymentStatus)) {
-          throw new Error("El estado de pago no es válido");
+        let bankAccountDocumentId: string | null = null;
+
+        if (data.bankAccount) {
+          const bankAccount = await strapi
+            .documents("api::bank-account.bank-account")
+            .findOne({
+              documentId: data.bankAccount,
+            });
+
+          if (!bankAccount) {
+            throw new Error("La cuenta bancaria indicada no existe");
+          }
+
+          // ¿La cuenta es la misma que ya tenía el pedido?
+          const existingBankAccountId =
+            existingOrder.bankAccount?.documentId ?? null;
+          const isSameBankAccount =
+            existingBankAccountId === bankAccount.documentId;
+
+          // Solo bloqueamos si es una cuenta inactiva Y distinta a la actual.
+          if (!bankAccount.active && !isSameBankAccount) {
+            throw new Error("La cuenta bancaria indicada está inactiva");
+          }
+
+          bankAccountDocumentId = bankAccount.documentId;
         }
+
+        const paymentStatus: "paid" | "pending" = bankAccountDocumentId
+          ? "paid"
+          : "pending";
 
         /*
          * 8. Validar y calcular la remesa
@@ -498,7 +556,8 @@ export default factories.createCoreService(
             recipientPhone: data.recipientPhone,
             remittance,
             total,
-            paymentStatus: data.paymentStatus,
+            paymentStatus,
+            bankAccount: bankAccountDocumentId,
           },
         });
 
@@ -539,7 +598,7 @@ export default factories.createCoreService(
           total,
           productsTotal,
           remittance,
-          paymentStatus: data.paymentStatus,
+          paymentStatus,
         };
       });
     },
@@ -965,7 +1024,16 @@ export default factories.createCoreService(
 
       const orders = await strapi.documents("api::order.order").findMany({
         filters,
-        populate: ["customer", "salesRep", "orderItems", "bankAccount"],
+        populate: {
+          customer: true,
+          salesRep: true,
+          orderItems: {
+            populate: {
+              product: true,
+            },
+          },
+          bankAccount: true,
+        },
         start,
         limit: pageSize,
         sort: ["date:desc", "sequenceNumber:desc"],
