@@ -8,7 +8,7 @@ export default factories.createCoreService(
   "api::order.order",
   ({ strapi }) => ({
     /**
-     * Obtiene el siguiente número consecutivo para una vendedora y fecha.
+     * Obtiene el siguiente número consecutivo para una vendedora y la fecha.
      */
     async getNextSequenceNumber(salesRepDocumentId: string, date: string) {
       const orders = await strapi.documents("api::order.order").findMany({
