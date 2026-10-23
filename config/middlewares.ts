@@ -41,6 +41,8 @@ export default [
         "https://cubaclick-control.pages.dev",
         "https://tienda-cubaclick.com",
         "https://www.tienda-cubaclick.com",
+        "https://control-cubaclick.com",
+        "https://www.control-cubaclick.com",
       ],
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
       keepHeadersOnError: true,

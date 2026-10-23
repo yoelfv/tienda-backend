@@ -700,7 +700,8 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     categoria: Schema.Attribute.Relation<
       "oneToOne",
       "api::categoria.categoria"
-    >;
+    > &
+      Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
       Schema.Attribute.Private;

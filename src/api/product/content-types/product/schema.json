@@ -26,12 +26,7 @@
       "type": "media",
       "multiple": false,
       "required": true,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
+      "allowedTypes": ["images", "files", "videos", "audios"]
     },
     "disponible": {
       "type": "boolean"
@@ -39,7 +34,8 @@
     "categoria": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "api::categoria.categoria"
+      "target": "api::categoria.categoria",
+      "required": true
     }
   }
 }
