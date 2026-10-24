@@ -29,7 +29,8 @@
       "allowedTypes": ["images", "files", "videos", "audios"]
     },
     "disponible": {
-      "type": "boolean"
+      "type": "boolean",
+      "required": true
     },
     "categoria": {
       "type": "relation",

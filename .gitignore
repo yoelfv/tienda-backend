@@ -121,7 +121,11 @@ yarn-error.log
 ############################
 
 coverage
-test-order.json
+scripts
+cloudinary-audit-result.json
+cloudinary-cleanup-log.json
+cloudinary-audit-result-production.json
+cloudinary-cleanup-log-production.json
 
 ############################
 # Strapi
