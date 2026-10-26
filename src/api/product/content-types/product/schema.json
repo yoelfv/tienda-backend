@@ -16,7 +16,7 @@
       "required": true
     },
     "precio": {
-      "type": "decimal",
+      "type": "string",
       "required": true
     },
     "descripcion": {
