@@ -72,7 +72,6 @@ $RECYCLE.BIN/
 *.sqlite
 *.sqlite3
 
-
 ############################
 # Misc.
 ############################
@@ -86,9 +85,6 @@ public/uploads/*
 !public/uploads/.gitkeep
 .tsbuildinfo
 .eslintcache
-.prettierignore
-.prettierrc
-eslint.config.mjs
 
 ############################
 # Node.js
