@@ -599,7 +599,7 @@ export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
     product: Schema.Attribute.Relation<"manyToOne", "api::product.product"> &
       Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    quantity: Schema.Attribute.Integer & Schema.Attribute.Required;
+    quantity: Schema.Attribute.Decimal & Schema.Attribute.Required;
     unitPrice: Schema.Attribute.Decimal & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
@@ -695,6 +695,9 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     nombre: Schema.Attribute.String & Schema.Attribute.Required;
     precio: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    saleUnit: Schema.Attribute.Enumeration<["unit", "weight"]> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<"unit">;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> &
       Schema.Attribute.Private;

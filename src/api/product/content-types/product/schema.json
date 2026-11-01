@@ -32,6 +32,12 @@
       "type": "boolean",
       "required": true
     },
+    "saleUnit": {
+      "type": "enumeration",
+      "enum": ["unit", "weight"],
+      "default": "unit",
+      "required": true
+    },
     "categoria": {
       "type": "relation",
       "relation": "manyToOne",

@@ -12,7 +12,7 @@
   "pluginOptions": {},
   "attributes": {
     "quantity": {
-      "type": "integer",
+      "type": "decimal",
       "required": true
     },
     "unitPrice": {

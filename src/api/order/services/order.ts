@@ -146,12 +146,7 @@ export default factories.createCoreService(
             throw new Error("Cada producto debe tener un documentId");
           }
 
-          if (!Number.isInteger(item.quantity) || item.quantity < 1) {
-            throw new Error(
-              "La cantidad de cada producto debe ser un entero mayor o igual a 1",
-            );
-          }
-
+          // Obtener el producto una sola vez y reutilizarlo
           const product = await strapi
             .documents("api::product.product")
             .findOne({
@@ -160,6 +155,30 @@ export default factories.createCoreService(
 
           if (!product) {
             throw new Error(`El producto ${item.product} no existe`);
+          }
+
+          // Validar cantidad según la unidad de venta
+          const isWeight = product.saleUnit === "weight";
+
+          if (isWeight) {
+            if (!Number.isFinite(item.quantity) || item.quantity <= 0) {
+              throw new Error(
+                `La cantidad de "${product.nombre}" debe ser mayor que 0`,
+              );
+            }
+
+            const rounded = Math.round(item.quantity * 100) / 100;
+            if (rounded !== item.quantity) {
+              throw new Error(
+                `La cantidad de "${product.nombre}" debe tener como máximo 2 decimales`,
+              );
+            }
+          } else {
+            if (!Number.isInteger(item.quantity) || item.quantity < 1) {
+              throw new Error(
+                `La cantidad de "${product.nombre}" debe ser un entero mayor o igual a 1`,
+              );
+            }
           }
 
           const unitPrice = Number(product.precio);
@@ -443,32 +462,45 @@ export default factories.createCoreService(
             throw new Error("Cada producto debe tener un documentId");
           }
 
-          if (!Number.isInteger(item.quantity) || item.quantity < 1) {
-            throw new Error(
-              "La cantidad de cada producto debe ser un entero mayor o igual a 1",
-            );
+          // Obtener el producto una sola vez y reutilizarlo
+          const product = await strapi
+            .documents("api::product.product")
+            .findOne({
+              documentId: item.product,
+            });
+
+          if (!product) {
+            throw new Error(`El producto ${item.product} no existe`);
           }
 
-          /*
-           * Si el producto ya pertenecía al pedido,
-           * conservar su precio histórico.
-           */
-          let unitPrice = existingPrices.get(item.product);
+          // Validar cantidad según la unidad de venta
+          const isWeight = product.saleUnit === "weight";
 
-          /*
-           * Si es un producto nuevo, obtener su precio actual.
-           */
-          if (unitPrice === undefined) {
-            const product = await strapi
-              .documents("api::product.product")
-              .findOne({
-                documentId: item.product,
-              });
-
-            if (!product) {
-              throw new Error(`El producto ${item.product} no existe`);
+          if (isWeight) {
+            if (!Number.isFinite(item.quantity) || item.quantity <= 0) {
+              throw new Error(
+                `La cantidad de "${product.nombre}" debe ser mayor que 0`,
+              );
             }
 
+            const rounded = Math.round(item.quantity * 100) / 100;
+            if (rounded !== item.quantity) {
+              throw new Error(
+                `La cantidad de "${product.nombre}" debe tener como máximo 2 decimales`,
+              );
+            }
+          } else {
+            if (!Number.isInteger(item.quantity) || item.quantity < 1) {
+              throw new Error(
+                `La cantidad de "${product.nombre}" debe ser un entero mayor o igual a 1`,
+              );
+            }
+          }
+
+          // Precio: si ya existía, mantener el histórico; si es nuevo, usar el actual
+          let unitPrice = existingPrices.get(item.product);
+
+          if (unitPrice === undefined) {
             unitPrice = Number(product.precio);
 
             if (!Number.isFinite(unitPrice) || unitPrice < 0) {
